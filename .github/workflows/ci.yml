@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
-        with: { go-version: "1.24" }
+        with: { go-version: "1.25" }
       - run: go mod tidy
       - run: go vet ./...
       - run: go test -race -count=1 ./...
@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
-        with: { go-version: "1.24" }
+        with: { go-version: "1.25" }
       - run: go mod tidy
       - run: go build -o bin/cspm ./cmd/cspm
 
