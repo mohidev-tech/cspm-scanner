@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.22" }
+      - run: go mod tidy
+      - run: go vet ./...
+      - run: go test -race -count=1 ./...
+
+  self-scan:
+    name: dogfood — scan our own fixtures
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.22" }
+      - run: go mod tidy
+      - run: go build -o bin/cspm ./cmd/cspm
+
+      - name: list checks
+        run: ./bin/cspm list-checks
+
+      - name: scan the good fixture (must be clean)
+        run: ./bin/cspm scan --fail-on LOW testdata/good
+
+      - name: scan the bad fixture (expects findings, exits 1)
+        run: |
+          set +e
+          ./bin/cspm scan --fail-on HIGH testdata/bad
+          rc=$?
+          if [ $rc -ne 1 ]; then
+            echo "expected exit code 1 from bad fixture, got $rc"
+            exit 1
+          fi
+
+      - name: scan the bad fixture → SARIF for Code Scanning
+        run: ./bin/cspm scan --format sarif --output cspm.sarif --fail-on LOW testdata/bad || true
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: cspm.sarif
+          category: cspm-self-scan
