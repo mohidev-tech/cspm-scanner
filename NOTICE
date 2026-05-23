@@ -1,0 +1,17 @@
+cspm-scanner
+Copyright 2026 mohidev-tech
+
+This product includes software developed at mohidev-tech (https://github.com/mohidev-tech).
+
+------------------------------------------------------------------------
+Third-party software
+------------------------------------------------------------------------
+
+This product bundles or depends on the following third-party software,
+each of which is licensed under its own terms:
+
+* github.com/hashicorp/hcl/v2
+  Mozilla Public License 2.0
+  https://github.com/hashicorp/hcl/blob/main/LICENSE
+
+The Go standard library is licensed under the BSD-3-Clause license.
